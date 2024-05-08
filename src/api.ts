@@ -3,7 +3,7 @@ export default class NotesAPI {
     const notes = JSON.parse(localStorage.getItem("notesapp-notes") || "[]");
 
     return notes.sort((a, b) => {
-      return new Date(a.updated) > new Date(b.updated) ? -1 : 1;
+      return new Date(a.updated_time) > new Date(b.updated_time) ? -1 : 1;
     });
   }
 
@@ -14,11 +14,11 @@ export default class NotesAPI {
     // Edit/Update
     if (existing) {
       existing.title = noteToSave.title;
-      existing.body = noteToSave.body;
-      existing.updated = new Date().toISOString();
+      existing.content = noteToSave.content;
+      existing.updated_time = new Date().toISOString();
     } else {
       noteToSave.id = Math.floor(Math.random() * 1000000);
-      noteToSave.updated = new Date().toISOString();
+      noteToSave.updated_time = new Date().toISOString();
       notes.push(noteToSave);
     }
 

@@ -4,6 +4,7 @@
     "useDefineForClassFields": true,
     "module": "ESNext",
     "lib": ["ESNext", "DOM"],
+    "typeRoots": ["./types", "./node_modules/@types"],
     "moduleResolution": "Node",
     "strict": true,
     "sourceMap": true,
@@ -14,5 +15,5 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true
   },
-  "include": ["./src"]
+  "include": ["./src/*.ts", "./types/*.d.ts"]
 }

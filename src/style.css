@@ -8,7 +8,7 @@
 }
 
 html,
-body {
+content {
   height: 100%;
   margin: 0;
 }
@@ -62,7 +62,7 @@ body {
 }
 
 .notes__small-title,
-.notes__small-updated {
+.notes__small-updated_time {
   padding: 10px;
 }
 
@@ -70,11 +70,11 @@ body {
   font-size: 1.2em;
 }
 
-.notes__small-body {
+.notes__small-content {
   padding: 0 10px;
 }
 
-.notes__small-updated {
+.notes__small-updated_time {
   color: #aaaaaa;
   font-style: italic;
   text-align: right;

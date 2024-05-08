@@ -40,17 +40,17 @@ export default class App {
       onNoteAdd: () => {
         const newNote = {
           title: "新建笔记",
-          body: "开始记录...",
+          content: "开始记录...",
         };
 
         NotesAPI.saveNote(newNote);
         this._refreshNotes();
       },
-      onNoteEdit: (title, body) => {
+      onNoteEdit: (title, content) => {
         NotesAPI.saveNote({
           id: this.activeNote.id,
           title,
-          body,
+          content,
         });
 
         this._refreshNotes();

@@ -39,18 +39,18 @@ export default class NotesView {
     this.updateNotePreviewVisibility(false);
   }
 
-  _createListItemHTML(id, title, body, updated) {
+  _createListItemHTML(id, title, content, updated_time) {
     const MAX_BODY_LENGTH = 60;
 
     return `
           <div class="notes__list-item" data-note-id="${id}">
               <div class="notes__small-title">${title}</div>
-              <div class="notes__small-body">
-                  ${body.substring(0, MAX_BODY_LENGTH)}
-                  ${body.length > MAX_BODY_LENGTH ? "..." : ""}
+              <div class="notes__small-content">
+                  ${content.substring(0, MAX_BODY_LENGTH)}
+                  ${content.length > MAX_BODY_LENGTH ? "..." : ""}
               </div>
-              <div class="notes__small-updated">
-                  ${updated.toLocaleString(undefined, {
+              <div class="notes__small-updated_time">
+                  ${updated_time.toLocaleString(undefined, {
                     dateStyle: "full",
                     timeStyle: "short",
                   })}
@@ -69,8 +69,8 @@ export default class NotesView {
       const html = this._createListItemHTML(
         note.id,
         note.title,
-        note.body,
-        new Date(note.updated)
+        note.content,
+        new Date(note.updated_time)
       );
 
       notesListContainer.insertAdjacentHTML("beforeend", html);
@@ -96,7 +96,7 @@ export default class NotesView {
 
   updateActiveNote(note) {
     this.root.querySelector(".notes__title").value = note.title;
-    this.root.querySelector(".notes__body").value = note.body;
+    this.root.querySelector(".notes__body").value = note.content;
 
     this.root.querySelectorAll(".notes__list-item").forEach((noteListItem) => {
       noteListItem.classList.remove("notes__list-item--selected");
