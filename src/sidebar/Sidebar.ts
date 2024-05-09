@@ -3,7 +3,7 @@ import SliderbarItem from "./SidebarItem";
 export default class Sidebar {
   public root: HTMLElement;
   public handlers: {
-    onAdd: (listItem: SliderbarItemData) => Promise<void>;
+    onAdd: (listItem?: SliderbarItemData) => Promise<void>;
     onSelect: (id: string) => void;
     onDelete: (id: string) => Promise<void>;
   };
@@ -12,7 +12,7 @@ export default class Sidebar {
   constructor(
     root: HTMLElement,
     handlers: {
-      onAdd: (listItem: SliderbarItemData) => Promise<void>;
+      onAdd: (listItem?: SliderbarItemData) => Promise<void>;
       onSelect: (id: string) => void;
       onDelete: (id: string) => Promise<void>;
     },
