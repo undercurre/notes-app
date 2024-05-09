@@ -1,5 +1,5 @@
-import App from "./app.js";
+import App from "./app";
 import "./style.css";
 
 const root = document.getElementById("app");
-new App(root);
+if (root) new App(root);

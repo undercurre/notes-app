@@ -1,8 +1,14 @@
 import NotesView from "./view";
 import NotesAPI from "./api";
 
+import { v4 as uuidv4 } from "uuid";
+
 export default class App {
-  constructor(root) {
+  public notes: Note[];
+  public activeNote: Note | null;
+  public view: NotesView;
+
+  constructor(root: HTMLElement) {
     this.notes = [];
     this.activeNote = null;
     this.view = new NotesView(root, this._handlers());
@@ -20,42 +26,50 @@ export default class App {
     }
   }
 
-  _setNotes(notes) {
+  _setNotes(notes: Note[]) {
     this.notes = notes;
     this.view.updateNoteList(notes);
     this.view.updateNotePreviewVisibility(notes.length > 0);
   }
 
-  _setActiveNote(note) {
+  _setActiveNote(note: Note) {
     this.activeNote = note;
     this.view.updateActiveNote(note);
   }
 
   _handlers() {
     return {
-      onNoteSelect: (noteId) => {
-        const selectedNote = this.notes.find((note) => note.id === noteId);
-        this._setActiveNote(selectedNote);
+      onNoteSelect: (noteId: string) => {
+        const selectedNote = this.notes.find(
+          (note: Note) => note.id === noteId
+        );
+        if (selectedNote) this._setActiveNote(selectedNote);
       },
       onNoteAdd: () => {
         const newNote = {
+          id: uuidv4(),
           title: "新建笔记",
           content: "开始记录...",
+          updated_time: new Date().toISOString(),
         };
 
         NotesAPI.saveNote(newNote);
         this._refreshNotes();
       },
-      onNoteEdit: (title, content) => {
-        NotesAPI.saveNote({
-          id: this.activeNote.id,
-          title,
-          content,
-        });
+      onNoteEdit: (title: string, content: string) => {
+        console.log("edit", this.activeNote);
+        if (this.activeNote) {
+          NotesAPI.saveNote({
+            id: this.activeNote.id,
+            title,
+            content,
+            updated_time: new Date().toISOString(),
+          });
 
-        this._refreshNotes();
+          this._refreshNotes();
+        }
       },
-      onNoteDelete: (noteId) => {
+      onNoteDelete: (noteId: string) => {
         NotesAPI.deleteNote(noteId);
         this._refreshNotes();
       },

@@ -1,13 +1,23 @@
 export default class NotesView {
+  public root: HTMLElement;
+  public handlers: {
+    onNoteSelect: (noteId: string) => void;
+    onNoteAdd: () => void;
+    onNoteEdit: (title: string, content: string) => void;
+    onNoteDelete: (noteId: string) => void;
+  };
+
   constructor(
-    root,
-    { onNoteSelect, onNoteAdd, onNoteEdit, onNoteDelete } = {}
+    root: HTMLElement,
+    handlers: {
+      onNoteSelect: (noteId: string) => void;
+      onNoteAdd: () => void;
+      onNoteEdit: (title: string, content: string) => void;
+      onNoteDelete: (noteId: string) => void;
+    }
   ) {
     this.root = root;
-    this.onNoteSelect = onNoteSelect;
-    this.onNoteAdd = onNoteAdd;
-    this.onNoteEdit = onNoteEdit;
-    this.onNoteDelete = onNoteDelete;
+    this.handlers = handlers;
     this.root.innerHTML = `
           <div class="notes__sidebar">
               <button class="notes__add" type="button">添加新的笔记 📒</button>
@@ -23,93 +33,108 @@ export default class NotesView {
     const inpTitle = this.root.querySelector(".notes__title");
     const inpBody = this.root.querySelector(".notes__body");
 
-    btnAddNote.addEventListener("click", () => {
-      this.onNoteAdd();
-    });
-
-    [inpTitle, inpBody].forEach((inputField) => {
-      inputField.addEventListener("blur", () => {
-        const updatedTitle = inpTitle.value.trim();
-        const updatedBody = inpBody.value.trim();
-
-        this.onNoteEdit(updatedTitle, updatedBody);
+    if (btnAddNote && inpTitle && inpBody) {
+      btnAddNote.addEventListener("click", () => {
+        this.handlers.onNoteAdd();
       });
-    });
 
-    this.updateNotePreviewVisibility(false);
+      [inpTitle, inpBody].forEach((inputField) => {
+        inputField.addEventListener("blur", () => {
+          if (
+            inpTitle instanceof HTMLInputElement &&
+            inpBody instanceof HTMLTextAreaElement
+          ) {
+            const updatedTitle = inpTitle.value.trim();
+            const updatedBody = inpBody.value.trim();
+
+            this.handlers.onNoteEdit(updatedTitle, updatedBody);
+          }
+        });
+      });
+
+      this.updateNotePreviewVisibility(false);
+    }
   }
 
-  _createListItemHTML(id, title, content, updated_time) {
+  _createListItemHTML(note: Note) {
     const MAX_BODY_LENGTH = 60;
 
     return `
-          <div class="notes__list-item" data-note-id="${id}">
-              <div class="notes__small-title">${title}</div>
+          <div class="notes__list-item" data-note-id="${note.id}">
+              <div class="notes__small-title">${note.title}</div>
               <div class="notes__small-content">
-                  ${content.substring(0, MAX_BODY_LENGTH)}
-                  ${content.length > MAX_BODY_LENGTH ? "..." : ""}
+                  ${note.content.substring(0, MAX_BODY_LENGTH)}
+                  ${note.content.length > MAX_BODY_LENGTH ? "..." : ""}
               </div>
               <div class="notes__small-updated_time">
-                  ${updated_time.toLocaleString(undefined, {
-                    dateStyle: "full",
-                    timeStyle: "short",
-                  })}
+                  ${new Date(note.updated_time).toLocaleString()}
               </div>
           </div>
       `;
   }
 
-  updateNoteList(notes) {
+  updateNoteList(notes: Note[]) {
     const notesListContainer = this.root.querySelector(".notes__list");
 
     // Empty list
-    notesListContainer.innerHTML = "";
+    if (notesListContainer instanceof HTMLElement) {
+      notesListContainer.innerHTML = "";
 
-    for (const note of notes) {
-      const html = this._createListItemHTML(
-        note.id,
-        note.title,
-        note.content,
-        new Date(note.updated_time)
-      );
+      for (const note of notes) {
+        const html = this._createListItemHTML(note);
 
-      notesListContainer.insertAdjacentHTML("beforeend", html);
-    }
+        notesListContainer.insertAdjacentHTML("beforeend", html);
+      }
 
-    // Add select/delete events for each list item
-    notesListContainer
-      .querySelectorAll(".notes__list-item")
-      .forEach((noteListItem) => {
-        noteListItem.addEventListener("click", () => {
-          this.onNoteSelect(noteListItem.dataset.noteId);
-        });
+      // Add select/delete events for each list item
+      notesListContainer
+        .querySelectorAll(".notes__list-item")
+        .forEach((noteListItem) => {
+          if (noteListItem instanceof HTMLElement) {
+            noteListItem.addEventListener("click", () => {
+              if (noteListItem.dataset.noteId)
+                this.handlers.onNoteSelect(noteListItem.dataset.noteId);
+            });
 
-        noteListItem.addEventListener("dblclick", () => {
-          const doDelete = confirm("确认要删除该笔记吗?");
+            noteListItem.addEventListener("dblclick", () => {
+              const doDelete = confirm("确认要删除该笔记吗?");
 
-          if (doDelete) {
-            this.onNoteDelete(noteListItem.dataset.noteId);
+              if (doDelete) {
+                if (noteListItem.dataset.noteId)
+                  this.handlers.onNoteDelete(noteListItem.dataset.noteId);
+              }
+            });
           }
         });
-      });
+    }
   }
 
-  updateActiveNote(note) {
-    this.root.querySelector(".notes__title").value = note.title;
-    this.root.querySelector(".notes__body").value = note.content;
+  updateActiveNote(note: Note) {
+    const title = this.root.querySelector(".notes__title");
+    const content = this.root.querySelector(".notes__body");
+    if (
+      title &&
+      content &&
+      title instanceof HTMLInputElement &&
+      content instanceof HTMLTextAreaElement
+    ) {
+      title.value = note.title;
+      content.value = note.content;
+    }
 
     this.root.querySelectorAll(".notes__list-item").forEach((noteListItem) => {
       noteListItem.classList.remove("notes__list-item--selected");
     });
 
-    this.root
-      .querySelector(`.notes__list-item[data-note-id="${note.id}"]`)
-      .classList.add("notes__list-item--selected");
+    const select = this.root.querySelector(
+      `.notes__list-item[data-note-id="${note.id}"]`
+    );
+    if (select) select.classList.add("notes__list-item--selected");
   }
 
-  updateNotePreviewVisibility(visible) {
-    this.root.querySelector(".notes__preview").style.visibility = visible
-      ? "visible"
-      : "hidden";
+  updateNotePreviewVisibility(visible: boolean) {
+    const preview = this.root.querySelector(".notes__preview");
+    if (preview instanceof HTMLElement)
+      preview.style.visibility = visible ? "visible" : "hidden";
   }
 }
