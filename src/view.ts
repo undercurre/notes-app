@@ -1,11 +1,16 @@
+import NotesAPI from "./api";
+import Sidebar from "./sidebar/Sidebar";
+
 export default class NotesView {
   public root: HTMLElement;
   public handlers: {
     onNoteSelect: (noteId: string) => void;
     onNoteAdd: () => void;
     onNoteEdit: (title: string, content: string) => void;
-    onNoteDelete: (noteId: string) => void;
+    onNoteDelete: (noteId: string) => Promise<void>;
   };
+  public sidebar: Sidebar;
+  public notes: Note[];
 
   constructor(
     root: HTMLElement,
@@ -13,9 +18,11 @@ export default class NotesView {
       onNoteSelect: (noteId: string) => void;
       onNoteAdd: () => void;
       onNoteEdit: (title: string, content: string) => void;
-      onNoteDelete: (noteId: string) => void;
-    }
+      onNoteDelete: (noteId: string) => Promise<void>;
+    },
+    notes: Note[]
   ) {
+    this.notes = notes;
     this.root = root;
     this.handlers = handlers;
     this.root.innerHTML = `
@@ -28,7 +35,22 @@ export default class NotesView {
               <textarea class="notes__body">编辑笔记...</textarea>
           </div>
       `;
-
+    const listContainer = this.root.querySelector(".notes__list");
+    this.sidebar = new Sidebar(
+      listContainer as HTMLElement,
+      {
+        onAdd: handlers.onNoteAdd,
+        onSelect: handlers.onNoteSelect,
+        onDelete: handlers.onNoteDelete,
+      },
+      notes.map((item) => {
+        return {
+          id: item.id,
+          title: item.title,
+          description: item.content,
+        };
+      })
+    );
     const btnAddNote = this.root.querySelector(".notes__add");
     const inpTitle = this.root.querySelector(".notes__title");
     const inpBody = this.root.querySelector(".notes__body");
@@ -107,34 +129,5 @@ export default class NotesView {
           }
         });
     }
-  }
-
-  updateActiveNote(note: Note) {
-    const title = this.root.querySelector(".notes__title");
-    const content = this.root.querySelector(".notes__body");
-    if (
-      title &&
-      content &&
-      title instanceof HTMLInputElement &&
-      content instanceof HTMLTextAreaElement
-    ) {
-      title.value = note.title;
-      content.value = note.content;
-    }
-
-    this.root.querySelectorAll(".notes__list-item").forEach((noteListItem) => {
-      noteListItem.classList.remove("notes__list-item--selected");
-    });
-
-    const select = this.root.querySelector(
-      `.notes__list-item[data-note-id="${note.id}"]`
-    );
-    if (select) select.classList.add("notes__list-item--selected");
-  }
-
-  updateNotePreviewVisibility(visible: boolean) {
-    const preview = this.root.querySelector(".notes__preview");
-    if (preview instanceof HTMLElement)
-      preview.style.visibility = visible ? "visible" : "hidden";
   }
 }

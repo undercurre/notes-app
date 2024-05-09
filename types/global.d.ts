@@ -20,3 +20,19 @@ declare type NotesView = {
     onNoteDelete: (noteId: string) => void;
   };
 };
+
+declare type SliderbarItem = {
+  root: HTMLElement;
+  data: SliderbarItemData;
+  handlers: {
+    onAdd: (listItem: SliderbarItemData) => Promise<void>;
+    onSelect: (noteId: string) => void;
+    onDelete: (noteId: string) => Promise<void>;
+  };
+};
+
+declare type SliderbarItemData = {
+  id: string;
+  title: string;
+  description: string;
+};
