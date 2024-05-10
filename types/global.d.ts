@@ -35,4 +35,11 @@ declare type SliderbarItemData = {
   id: string;
   title: string;
   description: string;
+  date: string;
+};
+
+declare type EditPanelData = {
+  id: string;
+  title: string;
+  content: string;
 };

@@ -1,15 +1,18 @@
+import AddButton from "./addButton/AddButton";
 import NotesAPI from "./api";
+import EditPanel from "./editPanel/EditPanel";
 import Sidebar from "./sidebar/Sidebar";
+import { v4 as uuidv4 } from "uuid";
 
 export default class NotesView {
   public root: HTMLElement;
   public activeNote: Note | null;
-  public sidebar: Sidebar;
+  public sidebar?: Sidebar;
+  public addButton?: AddButton;
+  public editPanel?: EditPanel;
   public notes: Note[];
 
-  constructor(
-    root: HTMLElement
-  ) {
+  constructor(root: HTMLElement) {
     this.root = root;
     this.notes = NotesAPI.getAllNotes();
     this.activeNote = null;
@@ -18,22 +21,103 @@ export default class NotesView {
         id: item.id,
         title: item.title,
         description: item.content,
+        date: item.updated_time,
       };
     });
-    this.sidebar = new Sidebar(root, this._sidebarhandlers, trans);
+    const sideContainer = root.querySelector(".notes__sidebar");
+    if (sideContainer && sideContainer instanceof HTMLElement)
+      this.sidebar = new Sidebar(sideContainer, this._sidebarhandlers(), trans);
+    const panelContainer = root.querySelector(".notes__preview");
+    if (panelContainer && panelContainer instanceof HTMLElement) {
+      const selected = this.notes[0];
+      this.editPanel = new EditPanel(panelContainer, this._editPanelHandlers());
+      this.editPanel.refill(selected.title, selected.content);
+    }
+    const addButtonContainer = root.querySelector(".add_button_container");
+    if (addButtonContainer && addButtonContainer instanceof HTMLElement)
+      this.addButton = new AddButton(
+        addButtonContainer,
+        this._addButtonHandlers()
+      );
   }
-  
 
   _sidebarhandlers() {
-   return {
-    onAdd: () => void,
-    onSelect: (id: string) => {
-      const selected = this.notes.find((item) => item.id === id)
-      if (selected) this.activeNote = selected
-    },
-    onDelete: async (id: string) => {
-      await this.handlers.onNoteDelete(id);
+    return {
+      onSelect: (id: string) => {
+        const selected = this.notes.find((item) => item.id === id);
+        if (selected && this.editPanel) {
+          this.activeNote = selected;
+          this.editPanel.refill(selected.title, selected.content);
+        }
+      },
+      onDelete: async (id: string) => {
+        NotesAPI.deleteNote(id);
+      },
+    };
+  }
+
+  _editPanelHandlers() {
+    return {
+      onEdit: async (title: string, content: string) => {
+        if (this.activeNote && this.sidebar) {
+          NotesAPI.saveNote({
+            id: this.activeNote.id,
+            title,
+            content,
+            updated_time: new Date().toISOString(),
+          });
+          this.sidebar.editListItem({
+            id: this.activeNote.id,
+            title,
+            description: content,
+            date: new Date().toISOString(),
+          });
+        }
+      },
+    };
+  }
+
+  _addButtonHandlers() {
+    return {
+      onAdd: async () => {
+        const newNote = await this._addNote();
+        if (this.sidebar)
+          this.sidebar.pushListItem({
+            id: newNote.id,
+            title: newNote.title,
+            description: newNote.content,
+            date: newNote.updated_time,
+          });
+      },
+    };
+  }
+
+  _addNote() {
+    const newNote = {
+      id: uuidv4(),
+      title: "新建笔记",
+      content: "开始记录...",
+      updated_time: new Date().toISOString(),
+    };
+
+    NotesAPI.saveNote(newNote);
+    return newNote;
+  }
+
+  _refresh() {
+    this.notes = NotesAPI.getAllNotes();
+    const trans = this.notes.map((item) => {
+      return {
+        id: item.id,
+        title: item.title,
+        description: item.content,
+        date: item.updated_time,
+      };
+    });
+    const sideContainer = this.root.querySelector(".notes__sidebar");
+    if (sideContainer && sideContainer instanceof HTMLElement) {
+      sideContainer.innerHTML = "";
+      this.sidebar = new Sidebar(sideContainer, this._sidebarhandlers(), trans);
     }
-   } 
   }
 }
