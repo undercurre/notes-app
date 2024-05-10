@@ -34,6 +34,7 @@ export default class NotesView {
       this.notes.length > 0
     ) {
       const selected = this.notes[0];
+      this.activeNote = selected;
       this.editPanel = new EditPanel(panelContainer, this._editPanelHandlers());
       this.editPanel.refill(selected.title, selected.content);
     }

@@ -44,7 +44,6 @@ export default class EditPanel {
           ) {
             const updatedTitle = inpTitle.value.trim();
             const updatedBody = inpBody.value.trim();
-
             this.handlers.onEdit(updatedTitle, updatedBody);
           }
         });

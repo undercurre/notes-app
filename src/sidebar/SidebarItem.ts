@@ -1,4 +1,4 @@
-const MAX_BODY_LENGTH = 60;
+const MAX_BODY_LENGTH = 30;
 
 export default class SidebarItem {
   public root: HTMLElement;
@@ -26,6 +26,7 @@ export default class SidebarItem {
     newDiv.classList.add("list-item", `data-item-id-${data.id}`);
     if (!isSelectedOne) {
       newDiv.classList.add("list-item--selected");
+      this.selectListItem(data.id);
     }
     const newTitleDisplay = document.createElement("span");
     newTitleDisplay.innerHTML = data.title;
@@ -34,7 +35,7 @@ export default class SidebarItem {
     newDescriptionDisplay.innerHTML = `${data.description.substring(
       0,
       MAX_BODY_LENGTH
-    )}${data.description.length > MAX_BODY_LENGTH ? "..." : ""};`;
+    )}${data.description.length > MAX_BODY_LENGTH ? "..." : ""}`;
     newDescriptionDisplay.classList.add("list-item_description");
     const newDateDisplay = document.createElement("span");
     newDateDisplay.innerHTML = new Date(data.date).toLocaleString();
@@ -100,22 +101,22 @@ export default class SidebarItem {
   async editListItem(data: SliderbarItemData) {
     try {
       const titleDisplay = document.querySelector(
-        `.data-item-id-"${data.id} .list-item_title`
+        `.data-item-id-${data.id} .list-item_title`
       );
       if (titleDisplay) {
         titleDisplay.innerHTML = data.title;
       }
       const descriptionDisplay = document.querySelector(
-        `.data-item-id-"${data.id} .list-item_description`
+        `.data-item-id-${data.id} .list-item_description`
       );
       if (descriptionDisplay) {
         descriptionDisplay.innerHTML = data.description;
       }
       const dateDisplay = document.querySelector(
-        `.data-item-id-"${data.id} .list-item_date`
+        `.data-item-id-${data.id} .list-item_date`
       );
       if (dateDisplay) {
-        dateDisplay.innerHTML = new Date().toISOString();
+        dateDisplay.innerHTML = new Date().toLocaleString();
       }
     } catch (e) {
       console.error("Failed to edit item:", e);

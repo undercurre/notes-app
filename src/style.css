@@ -88,17 +88,26 @@ body {
 }
 
 .list-item .list-item_title {
+  width: 80%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   color: white;
   font-weight: 300;
   position: absolute;
+  font-size: 20px;
   left: 20px;
   top: 15px;
 }
 
 .list-item .list-item_description {
+  width: 80%;
+  overflow: hidden;
   color: white;
   font-weight: 300;
   position: absolute;
+  padding-right: 10px;
+  text-align: left;
   left: 20px;
   top: 35px;
 }
@@ -107,8 +116,8 @@ body {
   color: white;
   font-weight: 300;
   position: absolute;
-  left: 20px;
-  top: 100px;
+  right: 20px;
+  bottom: 50px;
 }
 
 .list-item .list-item_del {

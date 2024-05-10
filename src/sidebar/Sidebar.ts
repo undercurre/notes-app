@@ -18,17 +18,21 @@ export default class Sidebar {
   ) {
     this.root = root;
     this.handlers = handlers;
-    const sorted = this.sortListData(list);
-    this.list = sorted.map(
-      (item) =>
-        new SliderbarItem(root, item, {
-          onSelect: handlers.onSelect,
-          onDelete: async (id) => {
-            await handlers.onDelete(id);
-            this.sortList();
-          },
-        })
-    );
+    if (list.length < 1) {
+      this.list = [];
+    } else {
+      const sorted = this.sortListData(list);
+      this.list = sorted.map(
+        (item) =>
+          new SliderbarItem(root, item, {
+            onSelect: handlers.onSelect,
+            onDelete: async (id) => {
+              await handlers.onDelete(id);
+              this.sortList();
+            },
+          })
+      );
+    }
   }
 
   pushListItem(listItem: SliderbarItemData) {
@@ -72,14 +76,13 @@ export default class Sidebar {
     this.list = this.list.sort((a, b) => {
       return new Date(a.data.date) > new Date(b.data.date) ? -1 : 1;
     });
-    const insertIndex = this.list.findIndex((item) => item.data.id === data.id);
     const refChild = this.root.querySelector(`.data-item-id-${data.id}`);
     if (curEdit) {
       curEdit.editListItem(data);
     }
 
-    if (refChild && insertIndex) {
-      this.root.insertBefore(refChild, this.root.childNodes[insertIndex]);
+    if (refChild) {
+      this.root.appendChild(refChild);
     }
   }
 
