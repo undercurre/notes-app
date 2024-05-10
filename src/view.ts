@@ -1,6 +1,8 @@
 import AddButton from "./addButton/AddButton";
 import NotesAPI from "./api";
 import EditPanel from "./editPanel/EditPanel";
+import ExportButton from "./exportButton/exportButton";
+import ImportButton from "./importButton/importButton";
 import Sidebar from "./sidebar/Sidebar";
 import { v4 as uuidv4 } from "uuid";
 
@@ -10,6 +12,8 @@ export default class NotesView {
   public sidebar?: Sidebar;
   public addButton?: AddButton;
   public editPanel?: EditPanel;
+  public importButton?: ImportButton;
+  public exportButton?: ExportButton;
   public notes: Note[];
 
   constructor(root: HTMLElement) {
@@ -42,6 +46,22 @@ export default class NotesView {
     if (addButtonContainer && addButtonContainer instanceof HTMLElement)
       this.addButton = new AddButton(
         addButtonContainer,
+        this._addButtonHandlers()
+      );
+    const importButtonContainer = root.querySelector(
+      ".import_button_container"
+    );
+    if (importButtonContainer && importButtonContainer instanceof HTMLElement)
+      this.importButton = new ImportButton(
+        importButtonContainer,
+        this._addButtonHandlers()
+      );
+    const exportButtonContainer = root.querySelector(
+      ".export_button_container"
+    );
+    if (exportButtonContainer && exportButtonContainer instanceof HTMLElement)
+      this.exportButton = new ExportButton(
+        exportButtonContainer,
         this._addButtonHandlers()
       );
   }

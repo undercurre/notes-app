@@ -134,13 +134,27 @@ body {
   flex-grow: 1;
 }
 
-.add_button_container {
+.add_button_container,
+.export_button_container,
+.import_button_container {
   position: absolute;
   right: 40px;
+}
+.add_button_container {
   top: 40px;
 }
 
-.add_button_container a {
+.export_button_container {
+  top: 80px;
+}
+
+.import_button_container {
+  top: 100px;
+}
+
+.add_button_container a,
+.export_button_container a,
+.import_button_container a {
   position: relative;
   display: inline-block;
   padding: 10px 20px;
@@ -154,7 +168,9 @@ body {
   letter-spacing: 4px;
 }
 
-.add_button_container a:hover {
+.add_button_container a:hover,
+.export_button_container a:hover,
+.import_button_container a:hover {
   background: #03e9f4;
   color: #fff;
   border-radius: 5px;
@@ -162,12 +178,16 @@ body {
     0 0 100px #03e9f4;
 }
 
-.add_button_container a span {
+.add_button_container a span,
+.export_button_container a span,
+.import_button_container a span {
   position: absolute;
   display: block;
 }
 
-.add_button_container a span:nth-child(1) {
+.add_button_container a span:nth-child(1),
+.export_button_container a span:nth-child(1),
+.import_button_container a span:nth-child(1) {
   top: 0;
   left: -100%;
   width: 100%;
@@ -186,7 +206,9 @@ body {
   }
 }
 
-.add_button_container a span:nth-child(2) {
+.add_button_container a span:nth-child(2),
+.export_button_container a span:nth-child(2),
+.import_button_container a span:nth-child(2) {
   top: -100%;
   right: 0;
   width: 2px;
@@ -206,7 +228,9 @@ body {
   }
 }
 
-.add_button_container a span:nth-child(3) {
+.add_button_container a span:nth-child(3),
+.export_button_container a span:nth-child(3),
+.import_button_container a span:nth-child(3) {
   bottom: 0;
   right: -100%;
   width: 100%;
@@ -226,7 +250,9 @@ body {
   }
 }
 
-.add_button_container a span:nth-child(4) {
+.add_button_container a span:nth-child(4),
+.export_button_container a span:nth-child(4),
+.import_button_container a span:nth-child(4) {
   bottom: -100%;
   left: 0;
   width: 2px;

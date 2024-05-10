@@ -11,6 +11,10 @@ export default class App {
       </div>
       <div class="add_button_container">
       </div>
+      <div class="export_button_container">
+      </div>
+      <div class="import_button_container">
+      </div>
     `;
 
     this.view = new NotesView(root);
