@@ -63,9 +63,23 @@ export default class Sidebar {
   }
 
   editListItem(data: SliderbarItemData) {
-    const editOne = this.list.find((item) => item.data.id === data.id);
-    if (editOne) {
-      editOne.editListItem(data);
+    const curEdit = this.list.find((item) => item.data.id === data.id);
+    if (curEdit) {
+      curEdit.data.title = data.title;
+      curEdit.data.description = data.description;
+      curEdit.data.date = data.date;
+    }
+    this.list = this.list.sort((a, b) => {
+      return new Date(a.data.date) > new Date(b.data.date) ? -1 : 1;
+    });
+    const insertIndex = this.list.findIndex((item) => item.data.id === data.id);
+    const refChild = this.root.querySelector(`.data-item-id-${data.id}`);
+    if (curEdit) {
+      curEdit.editListItem(data);
+    }
+
+    if (refChild && insertIndex) {
+      this.root.insertBefore(refChild, this.root.childNodes[insertIndex]);
     }
   }
 

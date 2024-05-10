@@ -28,7 +28,11 @@ export default class NotesView {
     if (sideContainer && sideContainer instanceof HTMLElement)
       this.sidebar = new Sidebar(sideContainer, this._sidebarhandlers(), trans);
     const panelContainer = root.querySelector(".notes__preview");
-    if (panelContainer && panelContainer instanceof HTMLElement) {
+    if (
+      panelContainer &&
+      panelContainer instanceof HTMLElement &&
+      this.notes.length > 0
+    ) {
       const selected = this.notes[0];
       this.editPanel = new EditPanel(panelContainer, this._editPanelHandlers());
       this.editPanel.refill(selected.title, selected.content);
@@ -52,6 +56,7 @@ export default class NotesView {
       },
       onDelete: async (id: string) => {
         NotesAPI.deleteNote(id);
+        this._refresh();
       },
     };
   }
@@ -66,6 +71,7 @@ export default class NotesView {
             content,
             updated_time: new Date().toISOString(),
           });
+          this._refresh();
           this.sidebar.editListItem({
             id: this.activeNote.id,
             title,
@@ -81,13 +87,32 @@ export default class NotesView {
     return {
       onAdd: async () => {
         const newNote = await this._addNote();
-        if (this.sidebar)
+        this._refresh();
+        if (this.sidebar) {
           this.sidebar.pushListItem({
             id: newNote.id,
             title: newNote.title,
             description: newNote.content,
             date: newNote.updated_time,
           });
+        }
+        if (this.editPanel) {
+          this.editPanel.refill(newNote.title, newNote.content);
+        } else {
+          const panelContainer = this.root.querySelector(".notes__preview");
+          if (
+            panelContainer &&
+            panelContainer instanceof HTMLElement &&
+            this.notes.length > 0
+          ) {
+            const selected = this.notes[0];
+            this.editPanel = new EditPanel(
+              panelContainer,
+              this._editPanelHandlers()
+            );
+            this.editPanel.refill(selected.title, selected.content);
+          }
+        }
       },
     };
   }
@@ -106,18 +131,5 @@ export default class NotesView {
 
   _refresh() {
     this.notes = NotesAPI.getAllNotes();
-    const trans = this.notes.map((item) => {
-      return {
-        id: item.id,
-        title: item.title,
-        description: item.content,
-        date: item.updated_time,
-      };
-    });
-    const sideContainer = this.root.querySelector(".notes__sidebar");
-    if (sideContainer && sideContainer instanceof HTMLElement) {
-      sideContainer.innerHTML = "";
-      this.sidebar = new Sidebar(sideContainer, this._sidebarhandlers(), trans);
-    }
   }
 }
