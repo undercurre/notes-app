@@ -11,6 +11,8 @@ declare type Note = {
   updated_time: string;
 };
 
+declare type ImportData = Omit<Note, "id">;
+
 declare type NotesView = {
   root: HTMLElement;
   handlers: {

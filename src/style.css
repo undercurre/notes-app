@@ -145,11 +145,11 @@ body {
 }
 
 .export_button_container {
-  top: 80px;
+  top: 180px;
 }
 
 .import_button_container {
-  top: 100px;
+  top: 240px;
 }
 
 .add_button_container a,
@@ -870,4 +870,8 @@ body.project.highcontrast-dark .editor pre {
 
 ::-webkit-scrollbar-corner {
   background-color: #ffffff;
+}
+
+#excelFile {
+  visibility: hidden;
 }

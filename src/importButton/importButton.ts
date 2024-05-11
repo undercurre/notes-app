@@ -14,6 +14,7 @@ export default class ImportButton {
     this.handlers = handlers;
 
     root.innerHTML = `
+    <input type="file" id="excelFile" accept=".xlsx, .xls" />
     <a class="import_button" href="#">
       <span></span>
       <span></span>
@@ -23,11 +24,17 @@ export default class ImportButton {
     </a>
     `;
 
+    const inputFile = document.getElementById("excelFile");
+    if (inputFile)
+      inputFile.addEventListener("change", () => {
+        this.handlers.onImport();
+      });
+
     const button = this.root.querySelector(".import_button");
 
-    if (button) {
+    if (button && inputFile) {
       button.addEventListener("click", () => {
-        this.handlers.onImport();
+        inputFile.click();
       });
     }
   }

@@ -5,6 +5,7 @@ import ExportButton from "./exportButton/exportButton";
 import ImportButton from "./importButton/importButton";
 import Sidebar from "./sidebar/Sidebar";
 import { v4 as uuidv4 } from "uuid";
+import * as XLSX from "xlsx";
 
 export default class NotesView {
   public root: HTMLElement;
@@ -54,7 +55,7 @@ export default class NotesView {
     if (importButtonContainer && importButtonContainer instanceof HTMLElement)
       this.importButton = new ImportButton(
         importButtonContainer,
-        this._addButtonHandlers()
+        this._importButtonHandlers()
       );
     const exportButtonContainer = root.querySelector(
       ".export_button_container"
@@ -62,7 +63,7 @@ export default class NotesView {
     if (exportButtonContainer && exportButtonContainer instanceof HTMLElement)
       this.exportButton = new ExportButton(
         exportButtonContainer,
-        this._addButtonHandlers()
+        this._exportButtonHandlers()
       );
   }
 
@@ -134,6 +135,67 @@ export default class NotesView {
             this.editPanel.refill(selected.title, selected.content);
           }
         }
+      },
+    };
+  }
+
+  _importButtonHandlers() {
+    return {
+      onImport: async () => {
+        let that = this;
+        const inputFile = document.getElementById("excelFile");
+        if (inputFile && inputFile instanceof HTMLInputElement) {
+          if (inputFile.files && inputFile.files.length > 0) {
+            const file = inputFile.files[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onload = function (e) {
+                if (e.target) {
+                  const data = e.target.result;
+                  const workbook = XLSX.read(data, { type: "array" });
+                  const sheetName = workbook.SheetNames[0]; // 取第一个工作表
+                  const worksheet = workbook.Sheets[sheetName];
+                  const json = XLSX.utils.sheet_to_json(worksheet, {
+                    raw: false,
+                  }) as ImportData[];
+                  const format = json.map((item) => {
+                    return {
+                      id: uuidv4(),
+                      ...item,
+                    };
+                  });
+                  format.map((item) => {
+                    NotesAPI.saveNote(item);
+                    if (that.sidebar)
+                      that.sidebar.pushListItem({
+                        id: item.id,
+                        title: item.title,
+                        description: item.content,
+                        date: item.updated_time,
+                      });
+                  });
+                  alert("Notes imported successfully!");
+                }
+              };
+              reader.readAsArrayBuffer(file);
+            }
+          } else {
+            alert("Please select a file first.");
+          }
+        }
+      },
+    };
+  }
+
+  _exportButtonHandlers() {
+    return {
+      onExport: async () => {
+        const notes = NotesAPI.getAllNotes();
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(notes);
+        XLSX.utils.book_append_sheet(wb, ws, "Notes");
+        const exportFileName = "NotesData.xlsx";
+        XLSX.writeFile(wb, exportFileName);
       },
     };
   }
