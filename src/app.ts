@@ -15,6 +15,9 @@ export default class App {
       </div>
       <div class="import_button_container">
       </div>
+      <a class="github" href="https://github.com/undercurre/notes-app" target="_blank">
+        <img src="mdi--github.svg" alt="GitHub">
+      </a>
     `;
 
     this.view = new NotesView(root);

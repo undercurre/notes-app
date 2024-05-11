@@ -875,3 +875,12 @@ body.project.highcontrast-dark .editor pre {
 #excelFile {
   visibility: hidden;
 }
+
+.github {
+  width: 2em;
+  height: 2em;
+  position: absolute;
+  right: 0;
+  top: 0;
+  color: #fff;
+}
