@@ -71,6 +71,18 @@ export default class NotesView {
     return {
       onSelect: (id: string) => {
         const selected = this.notes.find((item) => item.id === id);
+
+        const panelContainer = this.root.querySelector(".notes__preview");
+        if (
+          !this.editPanel &&
+          panelContainer &&
+          panelContainer instanceof HTMLElement
+        )
+          this.editPanel = new EditPanel(
+            panelContainer,
+            this._editPanelHandlers()
+          );
+
         if (selected && this.editPanel) {
           this.activeNote = selected;
           this.editPanel.refill(selected.title, selected.content);
@@ -164,7 +176,7 @@ export default class NotesView {
                       ...item,
                     };
                   });
-                  format.map((item) => {
+                  format.map((item, index) => {
                     NotesAPI.saveNote(item);
                     if (that.sidebar)
                       that.sidebar.pushListItem({
@@ -173,7 +185,26 @@ export default class NotesView {
                         description: item.content,
                         date: item.updated_time,
                       });
+                    if (index === 0) {
+                      if (!that.editPanel) {
+                        const panelContainer =
+                          that.root.querySelector(".notes__preview");
+                        if (
+                          panelContainer &&
+                          panelContainer instanceof HTMLElement
+                        ) {
+                          that.editPanel = new EditPanel(
+                            panelContainer,
+                            that._editPanelHandlers()
+                          );
+                        }
+                      }
+
+                      that.activeNote = item;
+                      that.editPanel!.refill(item.title, item.content);
+                    }
                   });
+                  that._refresh();
                   alert("Notes imported successfully!");
                 }
               };
